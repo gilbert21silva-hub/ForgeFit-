@@ -1,0 +1,18 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/waitlist",
+      "destination": "/waitlist.html"
+    },
+    {
+      "source": "/downloads",
+      "destination": "/downloads.html"
+    }
+  ]
+}
