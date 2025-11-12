@@ -1,0 +1,95 @@
+[
+  {
+    "id": "t_001",
+    "name": "Avery Cole",
+    "headline": "Strength & Kettlebell Specialist",
+    "services": [
+      "personal_training",
+      "programming",
+      "nutrition_basics"
+    ],
+    "specialties": [
+      "kettlebells",
+      "hypertrophy",
+      "fat_loss"
+    ],
+    "certifications": [
+      "NASM-CPT"
+    ],
+    "rate_per_hour": 85,
+    "in_home": true,
+    "virtual": true,
+    "groups": true,
+    "city": "Austin",
+    "state": "TX",
+    "country": "US",
+    "lat": 30.2672,
+    "lng": -97.7431,
+    "travel_radius_miles": 15,
+    "bio": "10+ years coaching; form-focused strength with progressive overload.",
+    "contact": {
+      "email": "avery@example.com"
+    }
+  },
+  {
+    "id": "t_002",
+    "name": "Jordan Reyes",
+    "headline": "Nutritionist & Habit Coach",
+    "services": [
+      "nutrition_coaching",
+      "habit_coaching"
+    ],
+    "specialties": [
+      "weight_management",
+      "sports_nutrition"
+    ],
+    "certifications": [
+      "RDN"
+    ],
+    "rate_per_hour": 95,
+    "in_home": false,
+    "virtual": true,
+    "groups": false,
+    "city": "San Antonio",
+    "state": "TX",
+    "country": "US",
+    "lat": 29.4241,
+    "lng": -98.4936,
+    "travel_radius_miles": 0,
+    "bio": "Practical plans you can follow. Focus on sustainable change.",
+    "contact": {
+      "email": "jordan@example.com"
+    }
+  },
+  {
+    "id": "t_003",
+    "name": "Kai Thompson",
+    "headline": "Performance Coach (Speed & Agility)",
+    "services": [
+      "personal_training",
+      "athlete_development"
+    ],
+    "specialties": [
+      "speed",
+      "agility",
+      "conditioning"
+    ],
+    "certifications": [
+      "CSCS"
+    ],
+    "rate_per_hour": 120,
+    "in_home": true,
+    "virtual": false,
+    "groups": true,
+    "city": "Dallas",
+    "state": "TX",
+    "country": "US",
+    "lat": 32.7767,
+    "lng": -96.797,
+    "travel_radius_miles": 25,
+    "bio": "Ex-D1 strength coach. Proven field-tested programming for athletes.",
+    "contact": {
+      "email": "kai@example.com"
+    }
+  }
+]
