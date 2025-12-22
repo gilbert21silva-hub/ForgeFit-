@@ -104,5 +104,14 @@
     applyFilters();
   });
 
-  render(trainers);
+  
+  // Auto-fill from URL params (e.g., /trainers?city=Austin&state=TX)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("city")) cityEl.value = params.get("city");
+  if (params.get("state")) stateEl.value = params.get("state");
+  if (params.get("maxRate")) maxRateEl.value = params.get("maxRate");
+  if (params.get("inHome") === "1") inHomeEl.checked = true;
+  if (params.get("virtual") === "1") virtualEl.checked = true;
+  if (params.get("groups") === "1") groupsEl.checked = true; 
+  applyFilters();
 })();
