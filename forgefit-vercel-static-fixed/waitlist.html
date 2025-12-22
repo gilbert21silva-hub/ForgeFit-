@@ -56,7 +56,7 @@
         Search
       </button>
 
-      <a href="/trainers" class="text-sm text-zinc-300 hover:text-white text-center">Browse all trainers</a>
+      <a href="/trainers.html" class="text-sm text-zinc-300 hover:text-white text-center">Browse all trainers</a>
     </form>
   </main>
 
@@ -73,7 +73,7 @@
       if (city) params.set("city", city);
       if (state) params.set("state", state);
       if (zip) params.set("zip", zip);
-      window.location.href = "/trainers?" + params.toString();
+      window.location.href = "/trainers.html?" + params.toString();
     });
   </script>
 </body>
