@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .grad{background-image:linear-gradient(90deg,#f59e0b,#ea580c)}
+  </style>
+
+  <title>ForgeFit — Pro Dashboard</title>
+  <meta name="description" content="ForgeFit professional dashboard.">
+</head>
+<body class="bg-zinc-950 text-white selection:bg-amber-300/30">
+  <div class="min-h-screen grid lg:grid-cols-[280px_1fr]">
+    <aside class="border-r border-zinc-800 bg-zinc-950/90 p-5">
+      <a href="/index.html" class="flex items-center gap-3">
+        <img src="/assets/forgefit-logo.png" alt="ForgeFit logo" class="h-10 w-auto">
+        <span class="text-xl font-extrabold tracking-tight">ForgeFit</span>
+      </a>
+      <nav class="mt-8 grid gap-2 text-sm">
+        <a href="#overview" class="rounded-xl bg-zinc-900 px-4 py-3 text-amber-400">Overview</a>
+        <a href="#messages" class="rounded-xl hover:bg-zinc-900 px-4 py-3 text-zinc-300">Messages</a>
+        <a href="#schedule" class="rounded-xl hover:bg-zinc-900 px-4 py-3 text-zinc-300">Schedule</a>
+        <a href="#clients" class="rounded-xl hover:bg-zinc-900 px-4 py-3 text-zinc-300">Client Progress</a>
+        <a href="#gallery" class="rounded-xl hover:bg-zinc-900 px-4 py-3 text-zinc-300">Progress Gallery</a>
+        <a href="#payments" class="rounded-xl hover:bg-zinc-900 px-4 py-3 text-zinc-300">Payments</a>
+        <a href="#profile" class="rounded-xl hover:bg-zinc-900 px-4 py-3 text-zinc-300">Edit Profile</a>
+      </nav>
+    </aside>
+
+    <main class="p-4 sm:p-6 lg:p-8">
+      <section id="overview" class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-amber-400 font-semibold">Professional Dashboard</p>
+          <h1 class="text-3xl font-black">Welcome back, Coach</h1>
+          <p class="mt-1 text-zinc-400">Manage clients, appointments, profile, payments, and progress tracking.</p>
+        </div>
+        <a href="/pros.html" class="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:border-zinc-500">Logout</a>
+      </section>
+
+      <section class="mt-8 grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5"><div class="text-sm text-zinc-400">Active Clients</div><div class="mt-2 text-3xl font-extrabold">24</div></div>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5"><div class="text-sm text-zinc-400">Appointments This Week</div><div class="mt-2 text-3xl font-extrabold">18</div></div>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5"><div class="text-sm text-zinc-400">Unread Messages</div><div class="mt-2 text-3xl font-extrabold">7</div></div>
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5"><div class="text-sm text-zinc-400">Monthly Revenue</div><div class="mt-2 text-3xl font-extrabold">$4,850</div></div>
+      </section>
+
+      <section class="mt-8 grid xl:grid-cols-2 gap-6">
+        <div id="messages" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div class="flex items-center justify-between"><h2 class="font-extrabold text-xl">Direct Messages</h2><button class="text-sm text-amber-400">View all</button></div>
+          <div class="mt-4 space-y-3">
+            <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><b>Marcus J.</b><p class="text-sm text-zinc-400">Can we reschedule Friday’s session?</p></div>
+            <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><b>Elena R.</b><p class="text-sm text-zinc-400">Uploaded new progress photos.</p></div>
+            <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><b>New Lead</b><p class="text-sm text-zinc-400">Looking for in-home strength training.</p></div>
+          </div>
+        </div>
+
+        <div id="schedule" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <div class="flex items-center justify-between"><h2 class="font-extrabold text-xl">Appointments</h2><button class="text-sm text-amber-400">Add session</button></div>
+          <div class="mt-4 space-y-3">
+            <div class="flex justify-between rounded-xl bg-zinc-950 border border-zinc-800 p-4"><span>9:00 AM — Fat Loss Check-in</span><span class="text-zinc-400">Virtual</span></div>
+            <div class="flex justify-between rounded-xl bg-zinc-950 border border-zinc-800 p-4"><span>12:00 PM — Strength Session</span><span class="text-zinc-400">In-home</span></div>
+            <div class="flex justify-between rounded-xl bg-zinc-950 border border-zinc-800 p-4"><span>5:30 PM — Group Training</span><span class="text-zinc-400">Outdoor</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="clients" class="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="font-extrabold text-xl">Client Progress Tracking</h2>
+          <button class="rounded-xl grad px-4 py-2 text-zinc-900 font-semibold text-sm">Add progress update</button>
+        </div>
+        <div class="mt-5 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-zinc-400 text-left">
+              <tr class="border-b border-zinc-800">
+                <th class="py-3">Client</th><th>BMI</th><th>BFP</th><th>Measurements</th><th>Weight Change</th><th>Goal</th>
+              </tr>
+            </thead>
+            <tbody class="text-zinc-300">
+              <tr class="border-b border-zinc-800"><td class="py-3 font-semibold text-white">Elena R.</td><td>24.1</td><td>22%</td><td>Waist -2.0 in</td><td>-8 lb</td><td>Fat loss</td></tr>
+              <tr class="border-b border-zinc-800"><td class="py-3 font-semibold text-white">Marcus J.</td><td>27.3</td><td>18%</td><td>Chest +1.5 in</td><td>+6 lb</td><td>Muscle gain</td></tr>
+              <tr><td class="py-3 font-semibold text-white">Dana K.</td><td>23.6</td><td>20%</td><td>Hips -1.0 in</td><td>-4 lb</td><td>Recomp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="gallery" class="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <div class="flex items-center justify-between"><h2 class="font-extrabold text-xl">Progress Photo Gallery</h2><button class="text-sm text-amber-400">Upload photos</button></div>
+        <div class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500">Before</div>
+          <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500">After</div>
+          <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500">Month 1</div>
+          <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500">Month 2</div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid xl:grid-cols-2 gap-6">
+        <div id="payments" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <h2 class="font-extrabold text-xl">Payments</h2>
+          <div class="mt-4 grid gap-3">
+            <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4 flex justify-between"><span>Monthly Coaching Package</span><b>$299</b></div>
+            <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4 flex justify-between"><span>Single Session</span><b>$85</b></div>
+            <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4 flex justify-between"><span>Group Class</span><b>$25/person</b></div>
+          </div>
+        </div>
+
+        <div id="profile" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <h2 class="font-extrabold text-xl">Edit Profile</h2>
+          <div class="mt-4 grid gap-3">
+            <input placeholder="Display name" class="rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 outline-none focus:border-amber-500">
+            <input placeholder="Certifications: NASM, CSCS, RDN..." class="rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 outline-none focus:border-amber-500">
+            <textarea placeholder="Bio" class="min-h-28 rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 outline-none focus:border-amber-500"></textarea>
+            <input placeholder="Instagram / TikTok / YouTube / Website links" class="rounded-xl bg-zinc-950 border border-zinc-800 px-4 py-3 outline-none focus:border-amber-500">
+            <button class="rounded-xl grad px-6 py-3 text-zinc-900 font-semibold">Save profile changes</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
