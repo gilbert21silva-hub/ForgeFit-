@@ -7,6 +7,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
       "source": "/waitlist",
       "destination": "/waitlist.html"
     },
