@@ -15,6 +15,18 @@ do $$ begin
   create type public.service_format as enum ('in_person', 'virtual', 'hybrid');
 exception when duplicate_object then null; end $$;
 
+do $$ begin
+  create type public.membership_status as enum (
+    'free_beta', 'trialing', 'active', 'past_due', 'canceled', 'expired'
+  );
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create type public.access_source as enum (
+    'free_beta', 'complimentary', 'promotional', 'paid', 'grandfathered'
+  );
+exception when duplicate_object then null; end $$;
+
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   role public.account_role not null default 'client',
@@ -118,11 +130,62 @@ create table if not exists public.early_access_signups (
   constraint early_access_notes_length check (char_length(notes) <= 2000)
 );
 
+create table if not exists public.membership_plans (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique,
+  role public.account_role not null,
+  name text not null,
+  monthly_price_cents integer,
+  annual_price_cents integer,
+  currency text not null default 'USD',
+  stripe_product_id text unique,
+  stripe_monthly_price_id text unique,
+  stripe_annual_price_id text unique,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint plan_monthly_price_nonnegative check (monthly_price_cents is null or monthly_price_cents >= 0),
+  constraint plan_annual_price_nonnegative check (annual_price_cents is null or annual_price_cents >= 0),
+  constraint plan_currency_code check (char_length(currency) = 3)
+);
+
+create table if not exists public.membership_features (
+  code text primary key,
+  name text not null,
+  description text,
+  active boolean not null default true
+);
+
+create table if not exists public.plan_features (
+  plan_id uuid not null references public.membership_plans(id) on delete cascade,
+  feature_code text not null references public.membership_features(code) on delete cascade,
+  primary key (plan_id, feature_code)
+);
+
+create table if not exists public.memberships (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  plan_id uuid not null references public.membership_plans(id) on delete restrict,
+  status public.membership_status not null default 'free_beta',
+  access_source public.access_source not null default 'free_beta',
+  stripe_customer_id text unique,
+  stripe_subscription_id text unique,
+  current_period_start timestamptz,
+  current_period_end timestamptz,
+  free_access_until timestamptz,
+  cancel_at_period_end boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint membership_period_order check (
+    current_period_end is null or current_period_start is null or current_period_end >= current_period_start
+  )
+);
+
 create index if not exists professional_profiles_discovery_idx
   on public.professional_profiles (published, accepting_clients, category, service_format);
 create index if not exists profiles_location_idx on public.profiles (country_code, region, city);
 create index if not exists certifications_professional_idx on public.certifications (professional_id);
 create index if not exists services_professional_idx on public.services (professional_id, active);
+create index if not exists memberships_status_idx on public.memberships (status, current_period_end);
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -150,6 +213,12 @@ create trigger certifications_set_updated_at before update on public.certificati
 for each row execute function public.set_updated_at();
 drop trigger if exists services_set_updated_at on public.services;
 create trigger services_set_updated_at before update on public.services
+for each row execute function public.set_updated_at();
+drop trigger if exists membership_plans_set_updated_at on public.membership_plans;
+create trigger membership_plans_set_updated_at before update on public.membership_plans
+for each row execute function public.set_updated_at();
+drop trigger if exists memberships_set_updated_at on public.memberships;
+create trigger memberships_set_updated_at before update on public.memberships
 for each row execute function public.set_updated_at();
 
 create or replace function public.handle_new_user()
@@ -180,6 +249,12 @@ begin
     insert into public.client_profiles (user_id) values (new.id);
   end if;
 
+  insert into public.memberships (user_id, plan_id, status, access_source)
+  select new.id, mp.id, 'free_beta'::public.membership_status, 'free_beta'::public.access_source
+  from public.membership_plans mp
+  where mp.code = case when requested_role = 'professional' then 'professional_monthly' else 'client_monthly' end
+  on conflict (user_id) do nothing;
+
   return new;
 end;
 $$;
@@ -197,6 +272,10 @@ alter table public.professional_specialties enable row level security;
 alter table public.certifications enable row level security;
 alter table public.services enable row level security;
 alter table public.early_access_signups enable row level security;
+alter table public.membership_plans enable row level security;
+alter table public.membership_features enable row level security;
+alter table public.plan_features enable row level security;
+alter table public.memberships enable row level security;
 
 drop policy if exists "profiles visible to owner or for published professionals" on public.profiles;
 create policy "profiles visible to owner or for published professionals"
@@ -277,6 +356,31 @@ to anon, authenticated with check (role in ('client', 'professional'));
 
 -- Intentionally no SELECT policy on early_access_signups. Contact data remains private.
 
+drop policy if exists "active membership plans are public" on public.membership_plans;
+create policy "active membership plans are public"
+on public.membership_plans for select using (active = true);
+
+drop policy if exists "active membership features are public" on public.membership_features;
+create policy "active membership features are public"
+on public.membership_features for select using (active = true);
+
+drop policy if exists "active plan features are public" on public.plan_features;
+create policy "active plan features are public"
+on public.plan_features for select
+using (
+  exists (
+    select 1 from public.membership_plans mp
+    where mp.id = plan_id and mp.active = true
+  )
+);
+
+drop policy if exists "users view own membership" on public.memberships;
+create policy "users view own membership"
+on public.memberships for select using (auth.uid() = user_id);
+
+-- Intentionally no browser INSERT, UPDATE, or DELETE policy on memberships.
+-- Only trusted server code and verified billing webhooks may change access.
+
 insert into public.specialties (slug, name) values
   ('strength-training', 'Strength Training'),
   ('mobility', 'Mobility'),
@@ -286,3 +390,45 @@ insert into public.specialties (slug, name) values
   ('military-preparation', 'Military Preparation'),
   ('accountability', 'Accountability Coaching')
 on conflict (slug) do update set name = excluded.name, active = true;
+
+insert into public.membership_plans (
+  code, role, name, monthly_price_cents, annual_price_cents, currency, active
+) values
+  ('professional_monthly', 'professional', 'ForgeFit Professional', 1000, null, 'USD', true),
+  ('client_monthly', 'client', 'ForgeFit Client', 500, null, 'USD', true)
+on conflict (code) do update set
+  role = excluded.role,
+  name = excluded.name,
+  monthly_price_cents = excluded.monthly_price_cents,
+  currency = excluded.currency,
+  active = excluded.active;
+
+insert into public.membership_features (code, name, description) values
+  ('account_access', 'Account Access', 'Create an account and access role-specific experiences.'),
+  ('professional_profile', 'Professional Profile', 'Create and publish a professional profile.'),
+  ('professional_tools', 'Professional Tools', 'Use professional business and client-management tools.'),
+  ('client_profile', 'Client Profile', 'Create a client profile and save preferences.'),
+  ('professional_discovery', 'Professional Discovery', 'Search and connect with professionals.'),
+  ('program_library', 'Program Library', 'Access purchased or assigned programs.')
+on conflict (code) do update set
+  name = excluded.name,
+  description = excluded.description,
+  active = true;
+
+insert into public.plan_features (plan_id, feature_code)
+select mp.id, feature.code
+from public.membership_plans mp
+cross join lateral (
+  select unnest(
+    case
+      when mp.code = 'professional_monthly' then array[
+        'account_access', 'professional_profile', 'professional_tools', 'professional_discovery'
+      ]
+      else array[
+        'account_access', 'client_profile', 'professional_discovery', 'program_library'
+      ]
+    end
+  ) as code
+) feature
+where mp.code in ('professional_monthly', 'client_monthly')
+on conflict (plan_id, feature_code) do nothing;
