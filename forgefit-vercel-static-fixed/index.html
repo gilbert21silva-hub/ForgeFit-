@@ -30,8 +30,8 @@
         <a href="/app#marketplace" class="transition hover:text-white">Marketplace</a>
       </nav>
       <div class="flex items-center gap-2 sm:gap-3">
-        <a href="/waitlist" class="hidden rounded-xl border border-zinc-700 px-4 py-2 text-sm font-semibold transition hover:border-zinc-500 sm:inline-flex">Sign in</a>
-        <a href="/waitlist" class="brand-gradient inline-flex rounded-xl px-4 py-2 text-sm font-bold text-zinc-950 transition hover:opacity-90">Join early access</a>
+        <a href="/auth" class="hidden rounded-xl border border-zinc-700 px-4 py-2 text-sm font-semibold transition hover:border-zinc-500 sm:inline-flex">Sign in</a>
+        <a href="/auth?mode=signup" class="brand-gradient inline-flex rounded-xl px-4 py-2 text-sm font-bold text-zinc-950 transition hover:opacity-90">Create free account</a>
       </div>
     </div>
   </header>
@@ -50,7 +50,7 @@
             ForgeFit connects clients with trusted independent fitness and wellness professionals, while giving professionals the tools to build their brand, manage clients, and grow a business of their own.
           </p>
           <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a href="/waitlist?type=professional" class="brand-gradient inline-flex items-center justify-center rounded-xl px-6 py-3.5 font-bold text-zinc-950 transition hover:opacity-90">Grow as a professional</a>
+            <a href="/auth?mode=signup&role=professional" class="brand-gradient inline-flex items-center justify-center rounded-xl px-6 py-3.5 font-bold text-zinc-950 transition hover:opacity-90">Grow as a professional</a>
             <a href="/app#discover" class="inline-flex items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900/70 px-6 py-3.5 font-bold transition hover:border-zinc-500">Explore professionals</a>
           </div>
           <p class="mt-4 text-sm text-zinc-400">Join the early-access community for trainers, coaches, nutritionists, and clients.</p>
@@ -113,7 +113,7 @@
               <li class="rounded-xl bg-black/20 p-3">✓ Create and sell workout plans</li>
               <li class="rounded-xl bg-black/20 p-3">✓ Build reviews and reputation</li>
             </ul>
-            <a href="/waitlist?type=professional" class="mt-8 inline-flex font-bold text-amber-400 hover:text-amber-300">Join as a professional →</a>
+            <a href="/auth?mode=signup&role=professional" class="mt-8 inline-flex font-bold text-amber-400 hover:text-amber-300">Join as a professional →</a>
           </article>
 
           <article id="clients" class="rounded-3xl border border-sky-400/20 bg-gradient-to-br from-sky-400/10 to-zinc-900 p-7 sm:p-9">
