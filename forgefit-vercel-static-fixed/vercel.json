@@ -19,6 +19,10 @@
       "destination": "/auth.html"
     },
     {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
       "source": "/downloads",
       "destination": "/downloads.html"
     }
