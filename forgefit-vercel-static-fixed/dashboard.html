@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ForgeFit Client Dashboard</title>
+  <meta name="description" content="Manage your ForgeFit client profile, goals, preferences, and free-beta membership.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/supabase-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <style>body{font-family:Inter,system-ui,sans-serif}.grad{background-image:linear-gradient(100deg,#fbbf24,#f97316)}.choice:has(input:checked){border-color:#f59e0b;background:rgba(245,158,11,.1);color:#fde68a}</style>
+</head>
+<body class="min-h-screen bg-zinc-950 text-white">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/90 backdrop-blur-xl">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <a href="/" class="flex items-center gap-3"><img src="/assets/forgefit-logo.png" alt="" class="h-9"><span class="text-xl font-black">ForgeFit</span><span class="hidden rounded-full border border-sky-400/20 bg-sky-400/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-sky-300 sm:inline">Client</span></a>
+      <div class="flex items-center gap-3"><a href="/app#discover" class="hidden text-sm font-bold text-amber-400 sm:inline">Discover professionals</a><button id="signoutButton" class="rounded-xl border border-zinc-700 px-4 py-2 text-sm font-bold hover:border-zinc-500">Sign out</button></div>
+    </div>
+  </header>
+
+  <main id="loadingView" class="mx-auto max-w-7xl px-4 py-20 text-center text-zinc-400 sm:px-6">Loading your ForgeFit account…</main>
+
+  <main id="dashboardView" class="mx-auto hidden max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <section class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div><p class="text-sm font-bold uppercase tracking-[.2em] text-sky-400">Client dashboard</p><h1 class="mt-2 text-4xl font-black tracking-tight sm:text-5xl">Welcome, <span id="welcomeName">ForgeFit member</span>.</h1><p class="mt-3 max-w-2xl text-zinc-400">Set your goals and preferences so ForgeFit can connect you with the right support.</p></div>
+      <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 px-5 py-4"><p class="text-xs font-bold uppercase tracking-wider text-emerald-300">Membership</p><p id="membershipName" class="mt-1 font-black">Free beta</p><p id="membershipDetail" class="mt-1 text-xs text-zinc-400">No payment required</p></div>
+    </section>
+
+    <section class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="rounded-2xl border border-white/10 bg-zinc-900 p-5"><p class="text-sm text-zinc-400">Profile completion</p><p id="completionValue" class="mt-2 text-3xl font-black">0%</p><div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-800"><div id="completionBar" class="grad h-full w-0 rounded-full"></div></div></article>
+      <article class="rounded-2xl border border-white/10 bg-zinc-900 p-5"><p class="text-sm text-zinc-400">Selected goals</p><p id="goalCount" class="mt-2 text-3xl font-black">0</p><p class="mt-2 text-xs text-zinc-500">Used for future matching</p></article>
+      <article class="rounded-2xl border border-white/10 bg-zinc-900 p-5"><p class="text-sm text-zinc-400">Saved professionals</p><p class="mt-2 text-3xl font-black">0</p><p class="mt-2 text-xs text-zinc-500">Saving comes next</p></article>
+      <article class="rounded-2xl border border-white/10 bg-zinc-900 p-5"><p class="text-sm text-zinc-400">Upcoming sessions</p><p class="mt-2 text-3xl font-black">0</p><p class="mt-2 text-xs text-zinc-500">Scheduling comes next</p></article>
+    </section>
+
+    <div class="mt-6 grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
+      <section class="rounded-3xl border border-white/10 bg-zinc-900/70 p-5 sm:p-8">
+        <div><p class="text-sm font-bold uppercase tracking-[.18em] text-amber-400">Your profile</p><h2 class="mt-2 text-2xl font-black">Tell us what support fits you.</h2><p class="mt-2 text-sm text-zinc-400">You control this information and can update it anytime.</p></div>
+        <form id="profileForm" class="mt-7 grid gap-6">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="text-sm text-zinc-400">Display name<input id="displayName" required maxlength="100" class="mt-1.5 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-amber-500"></label>
+            <label class="text-sm text-zinc-400">Account email<input id="accountEmail" disabled class="mt-1.5 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-zinc-500"></label>
+            <label class="text-sm text-zinc-400">City<input id="city" maxlength="100" class="mt-1.5 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-amber-500" placeholder="Corpus Christi"></label>
+            <label class="text-sm text-zinc-400">State or region<input id="region" maxlength="100" class="mt-1.5 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-amber-500" placeholder="Texas"></label>
+          </div>
+          <label class="text-sm text-zinc-400">About you<textarea id="bio" maxlength="2000" rows="3" class="mt-1.5 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-amber-500" placeholder="Share what you want professionals to understand about your journey."></textarea></label>
+
+          <fieldset><legend class="text-sm font-bold text-zinc-200">Your goals</legend><div id="goalsGroup" class="mt-3 grid gap-2 sm:grid-cols-2">
+            <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Build strength" class="mr-2 accent-amber-500">Build strength</label>
+            <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Improve mobility" class="mr-2 accent-amber-500">Improve mobility</label>
+            <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Weight management" class="mr-2 accent-amber-500">Weight management</label>
+            <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Sports performance" class="mr-2 accent-amber-500">Sports performance</label>
+            <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Military preparation" class="mr-2 accent-amber-500">Military preparation</label>
+            <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Health and accountability" class="mr-2 accent-amber-500">Health and accountability</label>
+          </div></fieldset>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <label class="text-sm font-bold text-zinc-200">Preferred training format<select id="preferredFormat" class="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"><option value="">No preference yet</option><option value="in_person">In person</option><option value="virtual">Virtual</option><option value="hybrid">Both / hybrid</option></select></label>
+            <fieldset><legend class="text-sm font-bold text-zinc-200">Professional interests</legend><div id="categoriesGroup" class="mt-2 grid gap-2">
+              <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Personal Training" class="mr-2 accent-amber-500">Personal training</label>
+              <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Nutrition" class="mr-2 accent-amber-500">Nutrition</label>
+              <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Sports Coaching" class="mr-2 accent-amber-500">Sports coaching</label>
+              <label class="choice rounded-xl border border-zinc-700 p-3 text-sm"><input type="checkbox" value="Military Preparation" class="mr-2 accent-amber-500">Military preparation</label>
+            </div></fieldset>
+          </div>
+          <button id="saveButton" class="grad rounded-xl px-6 py-3.5 font-black text-zinc-950">Save profile</button>
+          <p id="status" class="hidden rounded-xl border px-4 py-3 text-sm" role="status"></p>
+        </form>
+      </section>
+
+      <aside class="space-y-6">
+        <section class="rounded-3xl border border-white/10 bg-zinc-900 p-6"><p class="text-sm font-bold uppercase tracking-[.18em] text-sky-400">Next step</p><h2 class="mt-2 text-xl font-black">Find your professional.</h2><p class="mt-3 text-sm leading-6 text-zinc-400">Explore trainers, nutritionists, coaches, mentors, and military-preparation professionals. Live profiles will appear as professionals join and publish.</p><a href="/app#discover" class="mt-5 inline-flex font-bold text-amber-400">Explore discovery →</a></section>
+        <section class="rounded-3xl border border-white/10 bg-zinc-900 p-6"><h2 class="text-xl font-black">Your account</h2><dl class="mt-4 space-y-4 text-sm"><div class="flex justify-between gap-4"><dt class="text-zinc-500">Account type</dt><dd class="font-bold">Client</dd></div><div class="flex justify-between gap-4"><dt class="text-zinc-500">Access</dt><dd id="accessSource" class="font-bold text-emerald-300">Free beta</dd></div><div class="flex justify-between gap-4"><dt class="text-zinc-500">Billing</dt><dd class="font-bold">Not enabled</dd></div></dl></section>
+        <section class="rounded-3xl border border-amber-400/20 bg-amber-400/5 p-6"><h2 class="font-black">You’re helping build ForgeFit.</h2><p class="mt-2 text-sm leading-6 text-zinc-400">As an early client, your feedback will shape professional matching, scheduling, workouts, progress tracking, and notifications.</p></section>
+      </aside>
+    </div>
+  </main>
+
+  <main id="errorView" class="mx-auto hidden max-w-2xl px-4 py-20 text-center"><h1 class="text-3xl font-black">We couldn’t load your dashboard.</h1><p id="errorMessage" class="mt-3 text-zinc-400"></p><a href="/auth" class="mt-6 inline-flex font-bold text-amber-400">Return to sign in →</a></main>
+
+  <script>
+    const client=window.forgefitSupabase,byId=id=>document.getElementById(id);
+    let currentUser=null,currentProfile=null,currentClient=null;
+    const checkedValues=id=>[...document.querySelectorAll('#'+id+' input:checked')].map(input=>input.value);
+    const setChecks=(id,values=[])=>document.querySelectorAll('#'+id+' input').forEach(input=>input.checked=values.includes(input.value));
+    function showStatus(message,type='success'){const el=byId('status');el.textContent=message;el.className='rounded-xl border px-4 py-3 text-sm '+(type==='success'?'border-emerald-400/20 bg-emerald-400/5 text-emerald-300':'border-rose-400/20 bg-rose-400/5 text-rose-300')}
+    function showError(message){byId('loadingView').classList.add('hidden');byId('dashboardView').classList.add('hidden');byId('errorMessage').textContent=message;byId('errorView').classList.remove('hidden')}
+    function completion(){let points=0;if(byId('displayName').value.trim())points++;if(byId('city').value.trim()&&byId('region').value.trim())points++;if(byId('bio').value.trim())points++;if(checkedValues('goalsGroup').length)points++;if(byId('preferredFormat').value)points++;if(checkedValues('categoriesGroup').length)points++;const percent=Math.round(points/6*100);byId('completionValue').textContent=percent+'%';byId('completionBar').style.width=percent+'%';byId('goalCount').textContent=checkedValues('goalsGroup').length}
+    async function loadDashboard(){const {data:{session},error:sessionError}=await client.auth.getSession();if(sessionError||!session){location.replace('/auth?next=/dashboard');return}currentUser=session.user;const [profileResult,clientResult,membershipResult]=await Promise.all([client.from('profiles').select('display_name,city,region,bio,role').eq('id',currentUser.id).single(),client.from('client_profiles').select('goals,preferred_format,preferred_categories').eq('user_id',currentUser.id).single(),client.from('memberships').select('status,access_source,current_period_end,membership_plans(name,monthly_price_cents)').eq('user_id',currentUser.id).maybeSingle()]);if(profileResult.error)throw profileResult.error;if(profileResult.data.role!=='client'){location.replace('/app#professional');return}if(clientResult.error)throw clientResult.error;currentProfile=profileResult.data;currentClient=clientResult.data;byId('displayName').value=currentProfile.display_name||'';byId('welcomeName').textContent=currentProfile.display_name||'ForgeFit member';byId('accountEmail').value=currentUser.email||'';byId('city').value=currentProfile.city||'';byId('region').value=currentProfile.region||'';byId('bio').value=currentProfile.bio||'';byId('preferredFormat').value=currentClient.preferred_format||'';setChecks('goalsGroup',currentClient.goals||[]);setChecks('categoriesGroup',currentClient.preferred_categories||[]);if(membershipResult.data){const membership=membershipResult.data;byId('membershipName').textContent=membership.membership_plans?.name||'ForgeFit Client';byId('membershipDetail').textContent=membership.status==='free_beta'?'Free during beta · no payment required':membership.status.replaceAll('_',' ');byId('accessSource').textContent=membership.access_source.replaceAll('_',' ')}completion();byId('loadingView').classList.add('hidden');byId('dashboardView').classList.remove('hidden')}
+    byId('profileForm').addEventListener('input',completion);
+    byId('profileForm').onsubmit=async e=>{e.preventDefault();const button=byId('saveButton');button.disabled=true;button.textContent='Saving…';button.classList.add('opacity-60');byId('status').classList.add('hidden');try{const profilePayload={display_name:byId('displayName').value.trim(),city:byId('city').value.trim()||null,region:byId('region').value.trim()||null,bio:byId('bio').value.trim()||null};const clientPayload={goals:checkedValues('goalsGroup'),preferred_format:byId('preferredFormat').value||null,preferred_categories:checkedValues('categoriesGroup')};const [profileSave,clientSave]=await Promise.all([client.from('profiles').update(profilePayload).eq('id',currentUser.id),client.from('client_profiles').update(clientPayload).eq('user_id',currentUser.id)]);if(profileSave.error)throw profileSave.error;if(clientSave.error)throw clientSave.error;byId('welcomeName').textContent=profilePayload.display_name;completion();showStatus('Your ForgeFit client profile is saved.')}catch(error){showStatus(error.message||'We could not save your profile.','error')}finally{button.disabled=false;button.textContent='Save profile';button.classList.remove('opacity-60')}};
+    byId('signoutButton').onclick=async()=>{await client.auth.signOut();location.replace('/auth')};
+    loadDashboard().catch(error=>showError(error.message||'Please sign in again.'));
+  </script>
+</body>
+</html>
