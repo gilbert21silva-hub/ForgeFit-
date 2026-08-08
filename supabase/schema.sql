@@ -432,3 +432,46 @@ cross join lateral (
 ) feature
 where mp.code in ('professional_monthly', 'client_monthly')
 on conflict (plan_id, feature_code) do nothing;
+
+
+-- Explicit Data API privileges. The project is configured not to expose new
+-- tables automatically, so only the operations listed here are available to
+-- browser clients. Row Level Security policies above further restrict rows.
+grant usage on schema public to anon, authenticated;
+
+grant select on table
+  public.profiles,
+  public.professional_profiles,
+  public.specialties,
+  public.professional_specialties,
+  public.certifications,
+  public.services,
+  public.membership_plans,
+  public.membership_features,
+  public.plan_features
+to anon, authenticated;
+
+grant insert on table public.early_access_signups to anon, authenticated;
+
+grant update on table
+  public.profiles,
+  public.professional_profiles,
+  public.client_profiles
+to authenticated;
+
+grant select on table
+  public.client_profiles,
+  public.memberships
+to authenticated;
+
+grant insert, update, delete on table
+  public.professional_specialties,
+  public.certifications,
+  public.services
+to authenticated;
+
+grant all privileges on all tables in schema public to service_role;
+grant all privileges on all sequences in schema public to service_role;
+
+revoke execute on function public.set_updated_at() from public, anon, authenticated;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
