@@ -15,6 +15,10 @@
       "destination": "/waitlist.html"
     },
     {
+      "source": "/auth",
+      "destination": "/auth.html"
+    },
+    {
       "source": "/downloads",
       "destination": "/downloads.html"
     }
