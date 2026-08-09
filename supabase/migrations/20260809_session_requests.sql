@@ -85,7 +85,7 @@ begin
   end if;
 
   if auth.uid() = old.client_id then
-    if old.status not in ('pending', 'reschedule_proposed') then
+    if old.status not in ('pending', 'reschedule_proposed', 'approved') then
       raise exception 'This session request can no longer be changed by the client.';
     end if;
     if new.client_id is distinct from old.client_id
@@ -96,6 +96,9 @@ begin
     end if;
     if new.status not in ('pending', 'cancelled') then
       raise exception 'Clients may only keep a request pending or cancel it.';
+    end if;
+    if old.status = 'approved' and new.status <> 'cancelled' then
+      raise exception 'Approved sessions may only be cancelled by the client.';
     end if;
   elsif auth.uid() = old.professional_id then
     if new.client_id is distinct from old.client_id
