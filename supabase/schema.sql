@@ -278,13 +278,19 @@ alter table public.plan_features enable row level security;
 alter table public.memberships enable row level security;
 
 drop policy if exists "profiles visible to owner or for published professionals" on public.profiles;
-create policy "profiles visible to owner or for published professionals"
-on public.profiles for select
+drop policy if exists "profiles visible to owner published professionals or session parties" on public.profiles;
+create policy "profiles visible to owner published professionals or session parties"
+on public.profiles for select to authenticated
 using (
   auth.uid() = id
   or exists (
     select 1 from public.professional_profiles pp
     where pp.user_id = profiles.id and pp.published = true
+  )
+  or exists (
+    select 1 from public.session_requests request
+    where request.client_id = profiles.id
+      and request.professional_id = auth.uid()
   )
 );
 
