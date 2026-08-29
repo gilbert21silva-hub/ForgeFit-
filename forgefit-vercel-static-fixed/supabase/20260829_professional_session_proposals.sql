@@ -1,5 +1,6 @@
 -- ForgeFit professional-initiated session proposals
 alter table public.session_requests add column if not exists requested_by uuid references auth.users(id);
+drop trigger if exists guard_session_request_update on public.session_requests;
 update public.session_requests set requested_by=client_id where requested_by is null;
 alter table public.session_requests alter column requested_by set not null;
 alter table public.session_requests drop constraint if exists session_request_status;
@@ -69,3 +70,9 @@ begin
   elsif new.status<>'cancelled' then new.cancelled_by=null;new.cancelled_at=null;end if;
   new.updated_at=now();return new;
 end;$$;
+
+
+drop trigger if exists guard_session_request_update on public.session_requests;
+create trigger guard_session_request_update
+before update on public.session_requests
+for each row execute function public.guard_session_request_update();
