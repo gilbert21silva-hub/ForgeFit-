@@ -39,9 +39,9 @@ create table if not exists public.direct_messages (
 );
 create index if not exists direct_messages_thread_idx on public.direct_messages(connection_id,created_at);
 
-create or replace function public.is_message_participant(row public.message_connections)
+create or replace function public.is_message_participant(connection_record public.message_connections)
 returns boolean language sql stable security definer set search_path=public,pg_temp
-as $$ select auth.uid() in (row.client_id,row.professional_id,row.other_client_id) $$;
+as $$ select auth.uid() in (connection_record.client_id,connection_record.professional_id,connection_record.other_client_id) $$;
 
 create or replace function public.prepare_message_connection()
 returns trigger language plpgsql security definer set search_path=public,pg_temp
@@ -70,24 +70,24 @@ create or replace function public.respond_to_message_connection(connection_uuid 
 returns public.message_connections
 language plpgsql security definer set search_path=public,pg_temp
 as $$
-declare row public.message_connections;
+declare connection_record public.message_connections;
 begin
-  select * into row from public.message_connections where id=connection_uuid for update;
-  if row.id is null or auth.uid() is null then raise exception 'Connection not found.'; end if;
-  if decision='block' and auth.uid() in (row.client_id,row.professional_id,row.other_client_id) then
-    update public.message_connections set status='blocked',updated_at=now() where id=row.id returning * into row; return row;
+  select * into connection_record from public.message_connections where id=connection_uuid for update;
+  if connection_record.id is null or auth.uid() is null then raise exception 'Connection not found.'; end if;
+  if decision='block' and auth.uid() in (connection_record.client_id,connection_record.professional_id,connection_record.other_client_id) then
+    update public.message_connections set status='blocked',updated_at=now() where id=connection_record.id returning * into connection_record; return connection_record;
   end if;
-  if row.status<>'pending' or decision not in ('accept','decline') then raise exception 'This request cannot be changed.'; end if;
-  if row.connection_type='client_client' then
-    if auth.uid()<>row.other_client_id then raise exception 'Only the invited client can respond.'; end if;
-    update public.message_connections set status=case when decision='accept' then 'active' else 'declined' end,recipient_accepted_at=case when decision='accept' then now() else null end,updated_at=now() where id=row.id returning * into row;
+  if connection_record.status<>'pending' or decision not in ('accept','decline') then raise exception 'This request cannot be changed.'; end if;
+  if connection_record.connection_type='client_client' then
+    if auth.uid()<>connection_record.other_client_id then raise exception 'Only the invited client can respond.'; end if;
+    update public.message_connections set status=case when decision='accept' then 'active' else 'declined' end,recipient_accepted_at=case when decision='accept' then now() else null end,updated_at=now() where id=connection_record.id returning * into connection_record;
   else
-    if auth.uid()=row.client_id and row.client_accepted_at is null then row.client_accepted_at=now();
-    elsif auth.uid()=row.professional_id and row.professional_accepted_at is null then row.professional_accepted_at=now();
+    if auth.uid()=connection_record.client_id and connection_record.client_accepted_at is null then connection_record.client_accepted_at=now();
+    elsif auth.uid()=connection_record.professional_id and connection_record.professional_accepted_at is null then connection_record.professional_accepted_at=now();
     else raise exception 'The other person must respond.'; end if;
-    update public.message_connections set client_accepted_at=row.client_accepted_at,professional_accepted_at=row.professional_accepted_at,status=case when decision='decline' then 'declined' when row.client_accepted_at is not null and row.professional_accepted_at is not null then 'active' else 'pending' end,updated_at=now() where id=row.id returning * into row;
+    update public.message_connections set client_accepted_at=connection_record.client_accepted_at,professional_accepted_at=connection_record.professional_accepted_at,status=case when decision='decline' then 'declined' when connection_record.client_accepted_at is not null and connection_record.professional_accepted_at is not null then 'active' else 'pending' end,updated_at=now() where id=connection_record.id returning * into connection_record;
   end if;
-  return row;
+  return connection_record;
 end $$;
 
 alter table public.message_connections enable row level security;
