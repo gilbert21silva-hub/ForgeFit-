@@ -53,7 +53,7 @@ begin
   select role into client_role from public.profiles where id=new.client_id;
   if new.connection_type='professional_client' then
     select role into professional_role from public.profiles where id=new.professional_id;
-    if professional_role<>'professional' or client_role<>'client' or auth.uid() not in (new.professional_id,new.client_id) then raise exception 'Invalid professional/client connection.'; end if;
+    if professional_role<>'professional' or client_role<>'client' or auth.uid() not in (new.professional_id,new.client_id) then raise exception 'Invalid professional/client connection.'; end if;\n    if char_length(trim(coalesce(new.service_terms,''))) not between 10 and 4000 then raise exception 'Add the agreed service terms before requesting messaging.'; end if;
     if not exists(select 1 from public.session_requests s where s.professional_id=new.professional_id and s.client_id=new.client_id and s.status='approved') then raise exception 'Messaging opens after an approved service relationship.'; end if;
     if auth.uid()=new.client_id then new.client_accepted_at=now(); else new.professional_accepted_at=now(); end if;
   else
