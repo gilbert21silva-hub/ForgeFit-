@@ -39,13 +39,13 @@ with check (bucket_id='professional-gallery' and (storage.foldername(name))[1]=a
 drop policy if exists "professionals update own gallery files" on storage.objects;
 create policy "professionals update own gallery files" on storage.objects
 for update to authenticated
-using (bucket_id='professional-gallery' and owner_id=auth.uid())
-with check (bucket_id='professional-gallery' and owner_id=auth.uid());
+using (bucket_id='professional-gallery' and owner_id=auth.uid()::text)
+with check (bucket_id='professional-gallery' and owner_id=auth.uid()::text);
 
 drop policy if exists "professionals delete own gallery files" on storage.objects;
 create policy "professionals delete own gallery files" on storage.objects
 for delete to authenticated
-using (bucket_id='professional-gallery' and owner_id=auth.uid());
+using (bucket_id='professional-gallery' and owner_id=auth.uid()::text);
 
 drop policy if exists "members view permitted gallery files" on storage.objects;
 create policy "members view permitted gallery files" on storage.objects
@@ -53,7 +53,7 @@ for select to authenticated
 using (
   bucket_id='professional-gallery'
   and (
-    owner_id=auth.uid()
+    owner_id=auth.uid()::text
     or exists (
       select 1 from public.professional_gallery_media media
       where media.storage_path=storage.objects.name and media.published=true
