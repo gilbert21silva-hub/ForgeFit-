@@ -1,7 +1,7 @@
 -- ForgeFit member marketplace
 create table if not exists public.marketplace_listings (
   id uuid primary key default gen_random_uuid(),
-  seller_id uuid not null references auth.users(id) on delete cascade,
+  seller_id uuid not null references public.profiles(id) on delete cascade,
   title text not null check (char_length(trim(title)) between 3 and 120),
   description text not null check (char_length(trim(description)) between 10 and 3000),
   category text not null check (category in ('Strength equipment','Cardio equipment','CrossFit & functional','Sports equipment','Recovery & mobility','Nutrition & meal prep','Apparel & accessories','Other')),
@@ -24,7 +24,7 @@ create index if not exists marketplace_listings_seller_idx on public.marketplace
 create table if not exists public.marketplace_listing_photos (
   id uuid primary key default gen_random_uuid(),
   listing_id uuid not null references public.marketplace_listings(id) on delete cascade,
-  seller_id uuid not null references auth.users(id) on delete cascade,
+  seller_id uuid not null references public.profiles(id) on delete cascade,
   storage_path text not null unique,
   sort_order integer not null default 0,
   created_at timestamptz not null default now()
@@ -32,7 +32,7 @@ create table if not exists public.marketplace_listing_photos (
 create index if not exists marketplace_photos_listing_idx on public.marketplace_listing_photos(listing_id,sort_order);
 
 create table if not exists public.marketplace_saved_listings (
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
   listing_id uuid not null references public.marketplace_listings(id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key(user_id,listing_id)
@@ -41,8 +41,8 @@ create table if not exists public.marketplace_saved_listings (
 create table if not exists public.marketplace_inquiries (
   id uuid primary key default gen_random_uuid(),
   listing_id uuid not null references public.marketplace_listings(id) on delete cascade,
-  buyer_id uuid not null references auth.users(id) on delete cascade,
-  seller_id uuid not null references auth.users(id) on delete cascade,
+  buyer_id uuid not null references public.profiles(id) on delete cascade,
+  seller_id uuid not null references public.profiles(id) on delete cascade,
   message text not null check (char_length(trim(message)) between 3 and 1000),
   status text not null default 'open' check (status in ('open','closed')),
   created_at timestamptz not null default now(),
