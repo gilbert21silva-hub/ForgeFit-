@@ -12,6 +12,8 @@ create table if not exists public.marketplace_listings (
   city text,
   region text,
   postal_code text,
+  latitude double precision check (latitude is null or latitude between -90 and 90),
+  longitude double precision check (longitude is null or longitude between -180 and 180),
   status text not null default 'available' check (status in ('available','reserved','sold')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
