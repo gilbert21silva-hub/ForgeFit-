@@ -129,3 +129,4 @@ using (bucket_id='social-media' and (storage.foldername(name))[1]=auth.uid()::te
 
 grant execute on function public.socially_connected(uuid,uuid) to authenticated;
 grant execute on function public.can_view_social_post(uuid,text) to authenticated;
+\n-- Table privileges work together with the row-level security policies above.\ngrant select, insert, update, delete on table public.social_connections to authenticated;\ngrant select, insert, update, delete on table public.social_posts to authenticated;\ngrant select, insert, update, delete on table public.social_post_likes to authenticated;\ngrant select, insert, update, delete on table public.social_post_comments to authenticated;\ngrant select, insert, update, delete on table public.social_blocks to authenticated;\ngrant select, insert on table public.social_reports to authenticated;\n
