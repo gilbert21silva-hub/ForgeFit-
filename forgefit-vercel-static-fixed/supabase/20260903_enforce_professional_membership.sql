@@ -1,4 +1,6 @@
--- Apply after the dual-account migration. Clients must upgrade before Professional mode is enabled.\n\ncreate or replace function public.enable_professional_mode(category_name text default 'Fitness Professional')
+-- Apply after the dual-account migration. Clients must upgrade before Professional mode is enabled.
+
+create or replace function public.enable_professional_mode(category_name text default 'Fitness Professional')
 returns public.professional_profiles
 language plpgsql
 security definer
