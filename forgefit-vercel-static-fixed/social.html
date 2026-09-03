@@ -33,7 +33,7 @@
 </section>
 </main>
 <script>
-const sb=window.forgeFitSupabase.getClient();let me=null,myProfile=null,isPro=false,posts=[],profiles={},likes=[],comments=[],connections=[],blocked=[],activeTab='feed';
+const sb=window.forgefitSupabase;let me=null,myProfile=null,isPro=false,posts=[],profiles={},likes=[],comments=[],connections=[],blocked=[],activeTab='feed';
 const $=id=>document.getElementById(id);function notice(text,bad=false){const e=$('postStatus');e.textContent=text;e.className='rounded-xl border px-4 py-3 text-sm '+(bad?'border-rose-400/30 text-rose-300':'border-emerald-400/30 text-emerald-300')}
 function escapeTime(v){return new Date(v).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}
 async function load(){
