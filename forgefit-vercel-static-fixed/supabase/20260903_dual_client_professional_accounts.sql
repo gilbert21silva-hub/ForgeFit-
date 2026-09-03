@@ -23,9 +23,20 @@ language plpgsql
 security definer
 set search_path=public
 as $$
-declare result public.professional_profiles;
+declare
+  result public.professional_profiles;
+  has_professional_membership boolean;
 begin
   if auth.uid() is null then raise exception 'Sign in required.'; end if;
+  select exists(
+    select 1 from public.memberships m
+    join public.membership_plans mp on mp.id=m.plan_id
+    where m.user_id=auth.uid() and mp.role='professional'
+      and m.status in ('free_beta','trialing','active')
+  ) into has_professional_membership;
+  if not has_professional_membership then
+    raise exception 'A Professional membership upgrade is required to use Professional mode.';
+  end if;
   insert into public.professional_profiles(user_id,category)
   values(auth.uid(),coalesce(nullif(trim(category_name),''),'Fitness Professional'))
   on conflict(user_id) do nothing;
@@ -33,6 +44,3 @@ begin
   return result;
 end;
 $$;
-
-grant execute on function public.enable_client_mode() to authenticated;
-grant execute on function public.enable_professional_mode(text) to authenticated;
