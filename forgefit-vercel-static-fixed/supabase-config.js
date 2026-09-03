@@ -8,6 +8,8 @@ window.forgefitSupabase = window.supabase.createClient(
   window.FORGEFIT_SUPABASE.publishableKey,
   {
     auth: {
+      storage: window.sessionStorage,
+      storageKey: "forgefit-tab-auth",
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
