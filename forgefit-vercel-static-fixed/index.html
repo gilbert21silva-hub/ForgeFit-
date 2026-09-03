@@ -6,6 +6,8 @@
   <title>ForgeFit — Find Your Professional. Build Your Business.</title>
   <meta name="description" content="ForgeFit connects clients with independent fitness and wellness professionals while giving professionals the tools to build, manage, and grow their business.">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/supabase-config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
@@ -30,8 +32,8 @@
         <a href="/app#marketplace" class="transition hover:text-white">Marketplace</a>
       </nav>
       <div class="flex items-center gap-2 sm:gap-3">
-        <a href="/auth" class="hidden rounded-xl border border-zinc-700 px-4 py-2 text-sm font-semibold transition hover:border-zinc-500 sm:inline-flex">Sign in</a>
-        <a href="/auth?mode=signup" class="brand-gradient inline-flex rounded-xl px-4 py-2 text-sm font-bold text-zinc-950 transition hover:opacity-90">Create free account</a>
+        <a id="homeSessionLink" href="/auth" class="hidden rounded-xl border border-zinc-700 px-4 py-2 text-sm font-semibold transition hover:border-zinc-500 sm:inline-flex">Sign in</a>
+        <a id="homePrimaryLink" href="/auth?mode=signup" class="brand-gradient inline-flex rounded-xl px-4 py-2 text-sm font-bold text-zinc-950 transition hover:opacity-90">Create free account</a>
       </div>
     </div>
   </header>
@@ -181,5 +183,8 @@
       <div class="flex flex-wrap gap-5"><a href="#professionals" class="hover:text-white">Professionals</a><a href="#clients" class="hover:text-white">Clients</a><a href="#marketplace" class="hover:text-white">Marketplace</a><a href="/waitlist" class="hover:text-white">Early access</a></div>
     </div>
   </footer>
+<script>
+(async()=>{try{const {data:{session}}=await window.forgefitSupabase.auth.getSession();if(!session)return;const profile=await window.forgefitSupabase.from("profiles").select("role").eq("id",session.user.id).maybeSingle(),dashboard=profile.data?.role==="professional"?"/professional-dashboard":"/dashboard",sessionLink=document.getElementById("homeSessionLink"),primary=document.getElementById("homePrimaryLink");sessionLink.href=dashboard;sessionLink.textContent="Dashboard";sessionLink.classList.remove("hidden");sessionLink.classList.add("inline-flex");primary.href=dashboard;primary.textContent="Return to dashboard"}catch{}})();
+</script>
 </body>
 </html>
