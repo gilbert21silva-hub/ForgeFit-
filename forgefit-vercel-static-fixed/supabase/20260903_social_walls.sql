@@ -80,7 +80,7 @@ create policy "participants view social connections" on public.social_connection
 drop policy if exists "request social connection" on public.social_connections;
 create policy "request social connection" on public.social_connections for insert with check (auth.uid()=requester_id and status='pending');
 drop policy if exists "respond social connection" on public.social_connections;
-create policy "respond social connection" on public.social_connections for update using (auth.uid() in (requester_id,addressee_id)) with check (auth.uid() in (requester_id,addressee_id));
+create policy "respond social connection" on public.social_connections for update using (auth.uid()=addressee_id) with check (auth.uid()=addressee_id);
 drop policy if exists "remove social connection" on public.social_connections;
 create policy "remove social connection" on public.social_connections for delete using (auth.uid() in (requester_id,addressee_id));
 
