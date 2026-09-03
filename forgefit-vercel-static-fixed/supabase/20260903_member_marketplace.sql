@@ -55,6 +55,52 @@ alter table public.marketplace_listing_photos enable row level security;
 alter table public.marketplace_saved_listings enable row level security;
 alter table public.marketplace_inquiries enable row level security;
 
+create table if not exists public.marketplace_conversations (
+  id uuid primary key default gen_random_uuid(),
+  listing_id uuid not null references public.marketplace_listings(id) on delete cascade,
+  buyer_id uuid not null references public.profiles(id) on delete cascade,
+  seller_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check (buyer_id<>seller_id),
+  unique(listing_id,buyer_id,seller_id)
+);
+create index if not exists marketplace_conversations_participants_idx on public.marketplace_conversations(buyer_id,seller_id,updated_at desc);
+
+create table if not exists public.marketplace_messages (
+  id uuid primary key default gen_random_uuid(),
+  conversation_id uuid not null references public.marketplace_conversations(id) on delete cascade,
+  sender_id uuid not null references public.profiles(id) on delete cascade,
+  body text not null check (char_length(trim(body)) between 1 and 2000),
+  created_at timestamptz not null default now(),
+  read_at timestamptz
+);
+create index if not exists marketplace_messages_thread_idx on public.marketplace_messages(conversation_id,created_at);
+
+alter table public.marketplace_conversations enable row level security;
+alter table public.marketplace_messages enable row level security;
+
+drop policy if exists "participants view marketplace conversations" on public.marketplace_conversations;
+create policy "participants view marketplace conversations" on public.marketplace_conversations for select to authenticated
+using (auth.uid() in (buyer_id,seller_id));
+drop policy if exists "buyers start marketplace conversations" on public.marketplace_conversations;
+create policy "buyers start marketplace conversations" on public.marketplace_conversations for insert to authenticated
+with check (buyer_id=auth.uid() and exists(select 1 from public.marketplace_listings l where l.id=listing_id and l.seller_id=seller_id and l.seller_id<>auth.uid()));
+drop policy if exists "participants update marketplace conversations" on public.marketplace_conversations;
+create policy "participants update marketplace conversations" on public.marketplace_conversations for update to authenticated
+using (auth.uid() in (buyer_id,seller_id));
+
+drop policy if exists "participants view marketplace messages" on public.marketplace_messages;
+create policy "participants view marketplace messages" on public.marketplace_messages for select to authenticated
+using (exists(select 1 from public.marketplace_conversations c where c.id=conversation_id and auth.uid() in (c.buyer_id,c.seller_id)));
+drop policy if exists "participants send marketplace messages" on public.marketplace_messages;
+create policy "participants send marketplace messages" on public.marketplace_messages for insert to authenticated
+with check (sender_id=auth.uid() and exists(select 1 from public.marketplace_conversations c where c.id=conversation_id and auth.uid() in (c.buyer_id,c.seller_id)));
+drop policy if exists "recipients mark marketplace messages read" on public.marketplace_messages;
+create policy "recipients mark marketplace messages read" on public.marketplace_messages for update to authenticated
+using (sender_id<>auth.uid() and exists(select 1 from public.marketplace_conversations c where c.id=conversation_id and auth.uid() in (c.buyer_id,c.seller_id)));
+
+
 drop policy if exists "members browse marketplace listings" on public.marketplace_listings;
 create policy "members browse marketplace listings" on public.marketplace_listings for select to authenticated using (status in ('available','reserved') or seller_id=auth.uid());
 drop policy if exists "members create own marketplace listings" on public.marketplace_listings;
@@ -95,5 +141,5 @@ drop policy if exists "members view listed marketplace photos" on storage.object
 create policy "members view listed marketplace photos" on storage.objects for select to authenticated
 using (bucket_id='marketplace' and exists(select 1 from public.marketplace_listing_photos p join public.marketplace_listings l on l.id=p.listing_id where p.storage_path=storage.objects.name and (l.status in ('available','reserved') or l.seller_id=auth.uid())));
 
-grant select,insert,update,delete on public.marketplace_listings,public.marketplace_listing_photos,public.marketplace_saved_listings,public.marketplace_inquiries to authenticated;
+grant select,insert,update,delete on public.marketplace_listings,public.marketplace_listing_photos,public.marketplace_saved_listings,public.marketplace_inquiries,public.marketplace_conversations,public.marketplace_messages to authenticated;
 notify pgrst, 'reload schema';
