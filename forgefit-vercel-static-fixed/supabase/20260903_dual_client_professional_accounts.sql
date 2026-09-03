@@ -1,5 +1,6 @@
 -- Let one ForgeFit account use both client and professional capabilities.
 -- profiles.role remains the account's original/default landing role for compatibility.
+-- Professional membership includes Client mode. Client membership requires an upgrade for Professional mode.
 
 create or replace function public.enable_client_mode()
 returns public.client_profiles
@@ -29,9 +30,11 @@ declare
 begin
   if auth.uid() is null then raise exception 'Sign in required.'; end if;
   select exists(
-    select 1 from public.memberships m
+    select 1
+    from public.memberships m
     join public.membership_plans mp on mp.id=m.plan_id
-    where m.user_id=auth.uid() and mp.role='professional'
+    where m.user_id=auth.uid()
+      and mp.role='professional'
       and m.status in ('free_beta','trialing','active')
   ) into has_professional_membership;
   if not has_professional_membership then
@@ -44,3 +47,6 @@ begin
   return result;
 end;
 $$;
+
+grant execute on function public.enable_client_mode() to authenticated;
+grant execute on function public.enable_professional_mode(text) to authenticated;
