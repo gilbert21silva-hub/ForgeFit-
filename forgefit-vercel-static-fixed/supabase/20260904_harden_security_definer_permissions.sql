@@ -13,7 +13,7 @@ revoke execute on function public.is_message_participant(public.message_connecti
 revoke execute on function public.mark_connection_messages_read(uuid) from public,anon;
 revoke execute on function public.respond_to_message_connection(uuid,text) from public,anon;
 revoke execute on function public.respond_to_professional_review(uuid,text) from public,anon;
-revoke execute on function public.send_service_terms(uuid,text,text,text) from public,anon;
+revoke execute on function public.send_service_terms(uuid,text,text,text,text,bigint) from public,anon;
 revoke execute on function public.socially_connected(uuid,uuid) from public,anon;
 
 -- These functions are invoked only by database triggers/event triggers.
@@ -33,7 +33,7 @@ grant execute on function public.is_message_participant(public.message_connectio
 grant execute on function public.mark_connection_messages_read(uuid) to authenticated;
 grant execute on function public.respond_to_message_connection(uuid,text) to authenticated;
 grant execute on function public.respond_to_professional_review(uuid,text) to authenticated;
-grant execute on function public.send_service_terms(uuid,text,text,text) to authenticated;
+grant execute on function public.send_service_terms(uuid,text,text,text,text,bigint) to authenticated;
 grant execute on function public.socially_connected(uuid,uuid) to authenticated;
 
 -- Prevent future functions created by the migration owner from automatically becoming public.
