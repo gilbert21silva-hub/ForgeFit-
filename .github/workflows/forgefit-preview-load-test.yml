@@ -1,6 +1,11 @@
 name: ForgeFit preview load test
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tests/load/**'
+      - '.github/workflows/forgefit-preview-load-test.yml'
   workflow_dispatch:
     inputs:
       base_url:
@@ -18,9 +23,9 @@ jobs:
     steps:
       - name: Check out test
         uses: actions/checkout@v4
-      - name: Run staged public-page load test
+      - name: Install k6
         uses: grafana/setup-k6-action@v1
       - name: Execute k6
         env:
-          FORGEFIT_BASE_URL: ${{ inputs.base_url }}
+          FORGEFIT_BASE_URL: ${{ inputs.base_url || 'https://forge-fit-git-agent-production-r-e246df-gilbert-silvas-projects.vercel.app' }}
         run: k6 run tests/load/forgefit-smoke.js
