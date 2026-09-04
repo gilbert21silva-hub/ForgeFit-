@@ -15,6 +15,7 @@
 
 - [ ] Security Advisor has no unresolved critical findings
 - [ ] Performance Advisor findings are reviewed
+- [x] Supabase API monitoring is available and currently shows no response-error data
 - [ ] Row Level Security is enabled on every application table
 - [ ] Configure custom SMTP before a public signup campaign (currently using limited Supabase default email)
 - [ ] CAPTCHA is enabled for signup, sign-in, and password recovery
