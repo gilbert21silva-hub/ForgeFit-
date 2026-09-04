@@ -5,6 +5,7 @@ create table if not exists public.marketplace_listings (
   title text not null check (char_length(trim(title)) between 3 and 120),
   description text not null check (char_length(trim(description)) between 10 and 3000),
   category text not null check (category in ('Strength equipment','Cardio equipment','CrossFit & functional','Sports equipment','Recovery & mobility','Nutrition & meal prep','Apparel & accessories','Other')),
+  sport_tags text[] not null default '{}',
   item_condition text not null check (item_condition in ('New','Like new','Good','Fair')),
   price numeric(10,2) not null check (price>=0),
   negotiable boolean not null default false,
