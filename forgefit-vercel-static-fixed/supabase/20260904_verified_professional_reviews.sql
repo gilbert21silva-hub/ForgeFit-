@@ -49,7 +49,7 @@ create policy "members see own reports" on public.professional_review_reports fo
 
 create or replace function public.edit_professional_review(review_uuid uuid,new_rating smallint,new_text text)
 returns public.professional_reviews language plpgsql security definer set search_path=public,pg_temp
-as $
+as $edit_review$
 declare result public.professional_reviews;
 begin
   if new_rating not between 1 and 5 then raise exception 'Rating must be between 1 and 5.'; end if;
@@ -58,11 +58,11 @@ begin
   where id=review_uuid and client_id=auth.uid() returning * into result;
   if result.id is null then raise exception 'You can only edit your own review.'; end if;
   return result;
-end $;
+end $edit_review$;
 
 create or replace function public.respond_to_professional_review(review_uuid uuid,response_text text)
 returns public.professional_reviews language plpgsql security definer set search_path=public,pg_temp
-as $$
+as $respond_review$
 declare result public.professional_reviews;
 begin
   if char_length(trim(coalesce(response_text,''))) not between 2 and 1500 then raise exception 'Response must be between 2 and 1500 characters.'; end if;
@@ -70,7 +70,7 @@ begin
   where id=review_uuid and professional_id=auth.uid() returning * into result;
   if result.id is null then raise exception 'Only this professional can respond to the review.'; end if;
   return result;
-end $$;
+end $respond_review$;
 
 create or replace view public.professional_review_summary with (security_invoker=true) as
 select professional_id,round(avg(rating)::numeric,1) average_rating,count(*)::integer review_count
