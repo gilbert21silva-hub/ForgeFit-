@@ -14,7 +14,7 @@
 ## Supabase dashboard settings
 
 - [ ] Security Advisor has no unresolved critical findings
-- [ ] Performance Advisor findings are reviewed
+- [x] Query Performance reviewed: 99.95% cache hit rate; no slow ForgeFit application query identified
 - [x] Supabase API monitoring is available and currently shows no response-error data
 - [ ] Row Level Security is enabled on every application table
 - [ ] Configure custom SMTP before a public signup campaign (currently using limited Supabase default email)
