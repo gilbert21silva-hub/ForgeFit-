@@ -16,7 +16,7 @@
 - [ ] Security Advisor has no unresolved critical findings
 - [ ] Performance Advisor findings are reviewed
 - [ ] Row Level Security is enabled on every application table
-- [ ] Custom SMTP is configured before a public signup campaign
+- [ ] Configure custom SMTP before a public signup campaign (currently using limited Supabase default email)
 - [ ] CAPTCHA is enabled for signup, sign-in, and password recovery
 - [ ] Leaked-password protection is enabled after upgrading Supabase to Pro (not available on Free)
 - [ ] Production URL and auth recovery redirect URLs are allow-listed
