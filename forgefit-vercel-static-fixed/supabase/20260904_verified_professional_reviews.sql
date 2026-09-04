@@ -42,13 +42,23 @@ with check (
   )
 );
 drop policy if exists "clients edit own reviews" on public.professional_reviews;
-create policy "clients edit own reviews" on public.professional_reviews for update to authenticated
-using (client_id=auth.uid())
-with check (client_id=auth.uid() and professional_response is not distinct from (select r.professional_response from public.professional_reviews r where r.id=professional_reviews.id));
 drop policy if exists "members report reviews" on public.professional_review_reports;
 create policy "members report reviews" on public.professional_review_reports for insert to authenticated with check (reporter_id=auth.uid());
 drop policy if exists "members see own reports" on public.professional_review_reports;
 create policy "members see own reports" on public.professional_review_reports for select to authenticated using (reporter_id=auth.uid());
+
+create or replace function public.edit_professional_review(review_uuid uuid,new_rating smallint,new_text text)
+returns public.professional_reviews language plpgsql security definer set search_path=public,pg_temp
+as $
+declare result public.professional_reviews;
+begin
+  if new_rating not between 1 and 5 then raise exception 'Rating must be between 1 and 5.'; end if;
+  if char_length(trim(coalesce(new_text,''))) not between 20 and 2000 then raise exception 'Review must be between 20 and 2000 characters.'; end if;
+  update public.professional_reviews set rating=new_rating,review_text=trim(new_text),updated_at=now()
+  where id=review_uuid and client_id=auth.uid() returning * into result;
+  if result.id is null then raise exception 'You can only edit your own review.'; end if;
+  return result;
+end $;
 
 create or replace function public.respond_to_professional_review(review_uuid uuid,response_text text)
 returns public.professional_reviews language plpgsql security definer set search_path=public,pg_temp
@@ -69,5 +79,6 @@ from public.professional_reviews group by professional_id;
 grant select on public.professional_reviews,public.professional_review_summary to anon,authenticated;
 grant insert,update on public.professional_reviews to authenticated;
 grant select,insert on public.professional_review_reports to authenticated;
+grant execute on function public.edit_professional_review(uuid,smallint,text) to authenticated;
 grant execute on function public.respond_to_professional_review(uuid,text) to authenticated;
 notify pgrst, 'reload schema';
