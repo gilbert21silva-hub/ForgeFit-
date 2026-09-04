@@ -6,7 +6,7 @@
 - [x] Error rate threshold is below 1%
 - [x] Response-time thresholds are enforced
 - [x] High-traffic database indexes are installed
-- [ ] Supabase security audit returns only OK results
+- [x] Supabase security audit returns only OK results
 - [ ] Authenticated dashboard load test is completed on staging
 
 ## Supabase dashboard settings
