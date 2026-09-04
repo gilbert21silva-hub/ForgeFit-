@@ -7,6 +7,8 @@
 - [x] Response-time thresholds are enforced
 - [x] High-traffic database indexes are installed
 - [x] Supabase security audit returns only OK results
+- [x] Anonymous SECURITY DEFINER execution is removed
+- [x] Trigger functions cannot be called directly
 - [ ] Authenticated dashboard load test is completed on staging
 
 ## Supabase dashboard settings
