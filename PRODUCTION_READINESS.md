@@ -19,7 +19,7 @@
 - [ ] Configure custom SMTP before a public signup campaign (currently using limited Supabase default email)
 - [ ] CAPTCHA is enabled for signup, sign-in, and password recovery
 - [ ] Leaked-password protection is enabled after upgrading Supabase to Pro (not available on Free)
-- [ ] Production URL and auth recovery redirect URLs are allow-listed
+- [x] Production URL and auth recovery redirect URLs are allow-listed
 - [ ] Upgrade Supabase to Pro before real-user launch; Free currently has no project backups
 - [ ] Confirm at least 7 days of daily backup retention after upgrade
 - [ ] Point-in-Time Recovery is enabled before storing critical paid-member data
